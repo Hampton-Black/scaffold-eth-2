@@ -1,0 +1,39 @@
+jobs:
+  deploy:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16.x]
+
+    steps:
+      - name: Run hardhat node, deploy contracts (& generate contracts typescript output)
+        run: yarn chain & yarn deploy
+
+  contracts-lint:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16.x]
+
+    steps:
+      - name: Run hardhat lint
+        run: yarn hardhat:lint --max-warnings=0
+
+  test:
+    needs: [build, deploy]
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16.x]
+
+    steps:
+      - name: Run hardhat tests
+        run: yarn hardhat:test -vvv
