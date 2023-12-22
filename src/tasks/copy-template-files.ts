@@ -4,6 +4,7 @@ import { baseDir } from "../utils/consts";
 import { extensionDict } from "../utils/extensions-tree";
 import { findFilesRecursiveSync } from "../utils/find-files-recursively";
 import { mergePackageJson } from "../utils/merge-package-json";
+import { mergeWorkflowFiles } from "../utils/merge-workflow-files";
 import fs from "fs";
 import url from 'url'
 import ncp from "ncp";
@@ -71,6 +72,12 @@ const copyBaseFiles = async (
     );
   })
 
+  // merge base github actions workflow file
+  mergeWorkflowFiles(
+    path.join(targetDir, ".github/workflows/CI.yaml"),
+    path.join(basePath, ".github/workflows/CI.yaml")
+  );
+
   if (isDev) {
     const baseYarnLockPaths = findFilesRecursiveSync(basePath, path => isYarnLockRegex.test(path))
     baseYarnLockPaths.forEach(yarnLockPath => {
@@ -127,6 +134,12 @@ const copyExtensionsFiles = async (
       path.join(targetDir, "package.json"),
       path.join(extensionPath, "package.json"),
       isDev
+    );
+
+    // merge root github actions workflow files
+    mergeWorkflowFiles(
+      path.join(targetDir, ".github/workflows/CI.yaml"),
+      path.join(extensionPath, ".github/workflows/CI.yaml")
     );
 
     const extensionPackagesPath = path.join(extensionPath, "packages");
